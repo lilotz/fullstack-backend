@@ -1,4 +1,8 @@
+require('dotenv').config()
+
+const mongoose = require('mongoose')
 const express = require('express')
+const Entry = require('./models/entry')
 const morgan = require('morgan')
 const app = express()
 
@@ -14,65 +18,32 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 
 app.use(express.static('dist'))
 
-let persons = [
-    {
-        "id": "1",
-        "name": "Arto Hellas",
-        "number": "040-123456"
-    },
-    {
-        "id": "2",
-        "name": "Ada Lovelace",
-        "number": "39-44-5323523"
-    },
-    {
-        "id": "3",
-        "name": "Dan Abramov",
-        "number": "12-43-234345"
-    },
-    {
-        "id": "4",
-        "name": "Mary Poppendieck",
-        "number": "39-23-6423122"
-    }
-]
-
 app.get('/api/persons', (request, response) => {
-    response.json(persons)
+    Entry.find({}).then(entries => {
+        response.json(entries)
+    })
 })
 
-app.get('/info', (request, response) => {
-    number = persons.length
-    time = new Date()
+/*app.get('/info', (request, response) => {
+    const number 
+    const = time = new Date()
     response.send(`
         <p>Phonebook has info for ${number} people</p>
         <p>${time}</p>
         `)
-})
+})*/
 
 app.get('/api/persons/:id', (request, response) => {
-    const id = request.params.id
-    const person = persons.find(person => person.id === id)
-
-    if (person) {
-        response.json(person)
-    }
-    else {
-        response.status(404).end()
-    }
+    Entry.findById(request.params.id).then((entry) => {
+        response.json(entry)
+    })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-    const id = request.params.id
-    persons = persons.filter(person => person.id !== id)
-
-    response.status(204).end()
+    Entry.findById(request.params.id).then(entry => {
+        response.json(entry)
+    })
 })
-
-const generateId = () => {
-    const maxId = Math.floor(Math.random() * persons.length * 100)
-    return String(maxId + 1)
-}
 
 app.post('/api/persons', (request, response) => {
     const body = request.body
@@ -89,26 +60,25 @@ app.post('/api/persons', (request, response) => {
         })
     }
 
-    const names = persons.map(person => person.name)
+    /*const names = entries.map(person => person.name)
 
     if (names.some(name => name === body.name)) {
         return response.status(400).json({
             error: 'name must be unique'
         })
-    }
+    }*/
 
-    const person = {
+    const entry = new Entry({
         name: body.name,
-        number: body.number,
-        id: generateId(),
-    }
+        number: body.number
+    })
 
-    persons = persons.concat(person)
-
-    response.json(person)
+    entry.save().then(savedEntry => {
+        response.json(savedEntry)
+    })
 })
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
