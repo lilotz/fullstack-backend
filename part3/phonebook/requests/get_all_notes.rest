@@ -17,3 +17,12 @@ content-type: application/json
     "name": "Max Pod",
     "number": "39-23-6423122"
 }
+
+###
+PUT http://localhost:3001/api/persons/68dffbf4b7a2f956f05f23ee
+content-type: application/json
+
+{
+    "name": "Paula",
+    "number": "12345"
+}
