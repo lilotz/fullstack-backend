@@ -35,18 +35,20 @@ app.get('/api/persons', (request, response, next) => {
         .catch(error => next(error))
 })
 
-/*app.get('/info', (request, response) => {
-    const number 
-    const = time = new Date()
-    response.send(`
-        <p>Phonebook has info for ${number} people</p>
-        <p>${time}</p>
-        `)
-})*/
+app.get('/info', (request, response) => {
+    const time = new Date()
+    Entry.countDocuments({})
+        .then(count => {
+            response.send(`
+                <p>Phonebook has info for ${count} people</p>
+                <p>${time}</p>
+            `)
+        })
+})
 
 app.get('/api/persons/:id', (request, response, next) => {
     Entry.findById(request.params.id).then((entry) => {
-        if (note) {
+        if (entry) {
             response.json(entry)
         } else {
             response.status(404).end()
