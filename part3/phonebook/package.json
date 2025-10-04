@@ -8,7 +8,8 @@
     "dev": "node --watch index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:ui": "rm -rf dist && cd ../../../fullstack/part3/phonebook && npm run build && cp -r dist ../../../fullstack-backend/part3/phonebook",
-    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push",
+    "lint": "eslint ."
   },
   "author": "Lisa Lotz",
   "license": "ISC",
@@ -17,5 +18,11 @@
     "express": "^5.1.0",
     "mongoose": "^8.19.0",
     "morgan": "^1.10.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.37.0",
+    "@stylistic/eslint-plugin-js": "^4.4.1",
+    "globals": "^16.4.0",
+    "typescript-eslint": "^8.45.0"
   }
 }
