@@ -69,7 +69,7 @@ test('new blog has no information about likes', async () => {
   const oldLength = response.body.length
 
   const newBlog = {
-    title: 'React patterns 3',
+    title: 'React patterns 2',
     author: 'Michael Chan',
     url: 'https://reactpatterns.com/',
     __v: 0
@@ -82,4 +82,28 @@ test('new blog has no information about likes', async () => {
   const allBlogs = await helper.blogsInDb()
 
   assert.deepStrictEqual(allBlogs[oldLength].likes, 0)
+})
+
+test('title is missing', async () => {
+  const newBlog = {
+    author: 'Michael Chan',
+    url: 'https://reactpatterns.com/',
+    __v: 0
+  }
+
+  await api.post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+})
+
+test('url is missing', async () => {
+  const newBlog = {
+    title: 'React patterns 2',
+    author: 'Michael Chan',
+    __v: 0
+  }
+
+  await api.post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
 })
