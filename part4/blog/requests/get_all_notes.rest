@@ -6,8 +6,10 @@ POST http://localhost:3003/api/blogs
 content-Type: application/json
 
 {
-  "title": "My Life in Finland",
-  "author": "Lisa Lotz",
-  "url": "http://google.com",
-  "likes": 123
-}
+    "_id": "5a422a851b54a676234d17f7",
+    "title": "React patterns 2",
+    "author": "Michael Chan",
+    "url": "https://reactpatterns.com/",
+    "likes": 7,
+    "__v": 0
+  }

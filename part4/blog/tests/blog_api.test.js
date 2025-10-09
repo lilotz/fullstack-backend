@@ -8,7 +8,7 @@ const helper = require('./test_helper')
 
 const api = supertest(app)
 
-beforeEach(async() => {
+beforeEach(async () => {
   await Blog.deleteMany({})
   await Blog.insertMany(helper.initialBlogs)
 })
@@ -37,4 +37,49 @@ test('unique identifier is named id', async () => {
 
   assert.deepStrictEqual(typeof blog._id, 'undefined')
   assert.deepStrictEqual(typeof blog.id, 'string')
+})
+
+test('new blog has been added correctly', async () => {
+  const response = await api.get('/api/blogs')
+  const oldLength = response.body.length
+
+  const newBlog = {
+    title: 'React patterns 2',
+    author: 'Michael Chan',
+    url: 'https://reactpatterns.com/',
+    likes: 7,
+    __v: 0
+  }
+
+  await api.post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+
+  const allBlogs = await helper.blogsInDb()
+
+  assert.deepStrictEqual(oldLength + 1, allBlogs.length)
+
+  const titles = allBlogs.map(blog => blog.title)
+
+  assert(titles.includes('React patterns 2'))
+})
+
+test('new blog has no information about likes', async () => {
+  const response = await api.get('/api/blogs')
+  const oldLength = response.body.length
+
+  const newBlog = {
+    title: 'React patterns 3',
+    author: 'Michael Chan',
+    url: 'https://reactpatterns.com/',
+    __v: 0
+  }
+
+  await api.post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+
+  const allBlogs = await helper.blogsInDb()
+
+  assert.deepStrictEqual(allBlogs[oldLength].likes, 0)
 })
