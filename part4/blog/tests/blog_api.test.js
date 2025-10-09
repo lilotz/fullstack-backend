@@ -29,3 +29,12 @@ test('all blogs are returned', async () => {
 
   assert.strictEqual(response.body.length, 6)
 })
+
+test('unique identifier is named id', async () => {
+  const response = await api.get('/api/blogs')
+
+  const blog = response.body[0]
+
+  assert.deepStrictEqual(typeof blog._id, 'undefined')
+  assert.deepStrictEqual(typeof blog.id, 'string')
+})
