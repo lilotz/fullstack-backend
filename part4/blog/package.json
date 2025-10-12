@@ -14,9 +14,11 @@
   "author": "Lisa Lotz",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "cross-env": "^10.1.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "mongoose": "^8.19.0",
     "morgan": "^1.10.1"
