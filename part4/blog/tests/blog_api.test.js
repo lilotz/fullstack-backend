@@ -4,12 +4,27 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
+const User = require('../models/user')
+const bcrypt = require('bcrypt')
 const helper = require('./test_helper')
+const jwt = require('jsonwebtoken')
 
 const api = supertest(app)
 
+let token
+
 describe('when there is initially some notes saved', () => {
   beforeEach(async () => {
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    const user = new User({ username: 'user', passwordHash })
+
+    await user.save()
+
+    const userToken = { username: user.username, id: user._id }
+    token = jwt.sign(userToken, process.env.SECRET)
+
     await Blog.deleteMany({})
     await Blog.insertMany(helper.initialBlogs)
   })
@@ -17,18 +32,21 @@ describe('when there is initially some notes saved', () => {
   test('blogs are returned as json', async () => {
     await api
       .get('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
       .expect(200)
       .expect('Content-Type', /application\/json/)
   })
 
   test('all blogs are returned', async () => {
     const response = await api.get('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
 
     assert.strictEqual(response.body.length, 6)
   })
 
   test('unique identifier is named id', async () => {
     const response = await api.get('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
 
     const blog = response.body[0]
 
@@ -38,6 +56,7 @@ describe('when there is initially some notes saved', () => {
 
   test('finding a specific blog', async () => {
     const response = await api.get('/api/blogs/5a422a851b54a676234d17f7')
+      .set('Authorization', `Bearer ${token}`)
 
     const solution = {
       title: 'React patterns',
@@ -59,6 +78,7 @@ describe('when there is initially some notes saved', () => {
     }
 
     const response = await api.put('/api/blogs/5a422a851b54a676234d17f7')
+      .set('Authorization', `Bearer ${token}`)
       .send(updatedBlog)
 
     assert.deepStrictEqual(updatedBlog, response.body)
@@ -67,6 +87,7 @@ describe('when there is initially some notes saved', () => {
   describe('new blog is added', () => {
     test('new blog has been added correctly', async () => {
       const response = await api.get('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
       const oldLength = response.body.length
 
       const newBlog = {
@@ -78,6 +99,7 @@ describe('when there is initially some notes saved', () => {
       }
 
       await api.post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
 
@@ -94,6 +116,7 @@ describe('when there is initially some notes saved', () => {
   describe('some information about new blog is missing', () => {
     test('new blog has no information about likes', async () => {
       const response = await api.get('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
       const oldLength = response.body.length
 
       const newBlog = {
@@ -104,6 +127,7 @@ describe('when there is initially some notes saved', () => {
       }
 
       await api.post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
 
@@ -120,6 +144,7 @@ describe('when there is initially some notes saved', () => {
       }
 
       await api.post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(400)
     })
@@ -132,6 +157,7 @@ describe('when there is initially some notes saved', () => {
       }
 
       await api.post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(400)
     })
